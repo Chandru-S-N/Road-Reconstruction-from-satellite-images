@@ -1,0 +1,8 @@
+{
+  "synthetic": true,
+  "name": "09_invalid_image",
+  "description": "Corrupted PNG; loading must fail with a clear error.",
+  "expected": {
+    "load_error": true
+  }
+}

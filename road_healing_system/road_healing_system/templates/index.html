@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Road network healing</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230c3772'/><path d='M5 24 L13 15 M19 11 L27 5' stroke='white' stroke-width='3' stroke-linecap='round'/><path d='M13 15 L19 11' stroke='%2322c55e' stroke-width='3' stroke-linecap='round' stroke-dasharray='2 3'/></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#ffffff22"/><path d="M5 24 L13 15 M19 11 L27 5" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="M13 15 L19 11" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 3"/></svg>
+    <div class="brand-text"><h1>Context-Aware Road Network Healing</h1><p>Explainable, user-approved reconstruction</p></div>
+  </div>
+  <div class="job-chip" id="jobChip" hidden><span class="dot" id="jobDot"></span><span id="jobName"></span><span class="job-state" id="jobState"></span></div>
+  <div class="voice" role="group" aria-label="Voice guidance">
+    <button class="icon-btn" id="voiceToggle" aria-pressed="true" title="Voice on / mute">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path id="voiceWaves" d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </button>
+    <select id="voiceLang" aria-label="Voice language"><option value="en">English</option><option value="ta">தமிழ்</option></select>
+    <label class="auto"><input type="checkbox" id="voiceAuto" checked> Auto</label>
+    <button class="icon-btn" id="voiceReplay" title="Replay">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" fill="currentColor"/></svg></button>
+    <button class="icon-btn" id="voiceStop" title="Stop voice">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg></button>
+  </div>
+  <nav class="tools" aria-label="Tools">
+    <button class="tool" data-drawer="drawerUpload">New analysis</button>
+    <button class="tool" data-drawer="drawerParams">Parameters</button>
+    <button class="tool" data-drawer="drawerReports">Reports</button>
+    <button class="tool" data-drawer="drawerHistory">History</button>
+    <button class="tool" data-drawer="drawerLog">Log</button>
+  </nav>
+</header>
+
+<div class="caption" id="caption" role="status" aria-live="polite">
+  <span class="voice-status" id="voiceStatus">Voice: on · English</span>
+  <span class="caption-text" id="captionText">Upload a satellite image or choose a test scene to begin.</span>
+</div>
+
+<main class="stage" id="stageArea">
+  <!-- start screen -------------------------------------------------- -->
+  <section class="start" id="startScreen">
+    <div class="start-inner">
+      <div class="upload-card">
+        <h2>Start a new analysis</h2>
+        <label class="dropzone" id="dropzone" for="imageInput">
+          <input type="file" id="imageInput" accept=".png,.jpg,.jpeg,image/png,image/jpeg" hidden>
+          <svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M24 31V13m0 0-7 7m7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 31v5a3 3 0 0 0 3 3h24a3 3 0 0 0 3-3v-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <strong>Drop a satellite or aerial image</strong>
+          <span>or click to choose a PNG or JPG (up to {{ max_upload_mb }} MB)</span>
+          <span class="file-name" id="imageName"></span>
+        </label>
+        <div class="optional-files">
+          <label class="file-field"><span>Road mask <em>optional: used instead of road extraction</em></span><input type="file" id="maskInput" accept=".png,.jpg,.jpeg"></label>
+          <label class="file-field"><span>Reference mask <em>optional: enables accuracy metrics</em></span><input type="file" id="refInput" accept=".png,.jpg,.jpeg"></label>
+        </div>
+        <button class="btn btn-primary" id="uploadBtn" disabled>Upload and analyse</button>
+        <p class="form-error" id="uploadError" role="alert" hidden></p>
+      </div>
+      <div class="samples-card">
+        <h2>Or try a synthetic test scene</h2>
+        <p class="muted">Procedurally drawn scenes with known roads. Not real satellite imagery.</p>
+        <div class="sample-options">
+          <label><input type="checkbox" id="sampleUseMask"> Use the scene's gapped road mask</label>
+          <label><input type="checkbox" id="sampleUseRef" checked> Use its reference mask</label>
+        </div>
+        <div class="samples" id="samples"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- progress while analysing --------------------------------------- -->
+  <section class="progress-screen" id="progressScreen" hidden>
+    <div class="progress-card">
+      <h2>Analysing <span id="progressName"></span></h2>
+      <div class="bar"><div class="bar-fill" id="runBar"></div></div>
+      <ol class="run-stages" id="runStages"></ol>
+      <p class="form-error" id="runError" role="alert" hidden></p>
+    </div>
+  </section>
+
+  <!-- carousel ------------------------------------------------------ -->
+  <section class="carousel" id="carousel" hidden>
+    <div class="carousel-head">
+      <ol class="steps" id="steps" aria-label="Slides"></ol>
+      <div class="counter"><span id="slideCounter">Slide 1 of 12</span></div>
+    </div>
+    <div class="slide-progress" aria-hidden="true"><div id="slideBar"></div></div>
+    <div class="track-window"><div class="track" id="track"></div></div>
+    <div class="carousel-foot">
+      <button class="btn btn-quiet" id="prevBtn">Previous</button>
+      <div class="gapnav" id="gapNav" hidden></div>
+      <button class="btn btn-primary" id="nextBtn">Next</button>
+    </div>
+  </section>
+</main>
+
+<!-- drawers ----------------------------------------------------------- -->
+<aside class="drawer" id="drawerUpload" aria-label="New analysis" hidden>
+  <header><h2>New analysis</h2><button class="close" data-close aria-label="Close">×</button></header>
+  <p class="muted">Starting a new analysis keeps the current one in the processing history.</p>
+  <button class="btn btn-primary" id="goStart">Choose an image or test scene</button>
+</aside>
+<aside class="drawer wide" id="drawerParams" aria-label="Parameters" hidden>
+  <header><h2>Parameters</h2><button class="close" data-close aria-label="Close">×</button></header>
+  <p class="muted">Changes apply when you re-run the analysis. CARS weights are normalised to sum to 1.</p>
+  <form id="paramForm" class="param-form" novalidate></form>
+  <p class="form-error" id="paramError" role="alert" hidden></p>
+  <div class="drawer-actions"><button class="btn btn-quiet" id="resetParams">Reset to defaults</button>
+    <button class="btn btn-primary" id="rerunBtn" disabled>Re-run analysis</button></div>
+</aside>
+<aside class="drawer" id="drawerReports" aria-label="Reports" hidden>
+  <header><h2>Reports and downloads</h2><button class="close" data-close aria-label="Close">×</button></header>
+  <button class="btn btn-primary" id="pdfBtn" disabled>Generate PDF report</button>
+  <p class="muted small" id="pdfMsg"></p>
+  <div class="exports" id="exports"><p class="muted">Results appear here after an analysis.</p></div>
+</aside>
+<aside class="drawer wide" id="drawerHistory" aria-label="History" hidden>
+  <header><h2>Processing history</h2><button class="close" data-close aria-label="Close">×</button></header>
+  <div class="table-wrap" id="historyTable"></div>
+</aside>
+<aside class="drawer wide" id="drawerLog" aria-label="Log" hidden>
+  <header><h2>Processing log</h2><button class="close" data-close aria-label="Close">×</button></header>
+  <pre class="log" id="log">No messages yet.</pre>
+</aside>
+<div class="scrim" id="scrim" hidden></div>
+<div class="zoombox" id="zoombox" role="dialog" aria-modal="true" aria-labelledby="zoomTitle" hidden>
+  <div class="zoombox-inner"><header><h2 id="zoomTitle"></h2><button class="close" id="zoomClose" aria-label="Close">×</button></header>
+  <div id="zoomArea"></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/graph.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

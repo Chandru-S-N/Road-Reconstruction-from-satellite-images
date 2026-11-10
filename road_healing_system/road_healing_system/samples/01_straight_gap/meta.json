@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "name": "01_straight_gap",
+  "description": "Straight road interrupted by tree canopy.",
+  "expected": {
+    "true_gaps": 1,
+    "should_connect": true,
+    "true_gaps_when_segmented": 1
+  },
+  "gaps": [
+    {
+      "type": "tree canopy",
+      "center": [
+        192,
+        196
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

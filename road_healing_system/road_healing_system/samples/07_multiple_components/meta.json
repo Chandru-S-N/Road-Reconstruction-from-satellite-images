@@ -1,0 +1,34 @@
+{
+  "synthetic": true,
+  "name": "07_multiple_components",
+  "description": "Tree-shaped network split into four components by three gaps (tree, shadow, mask dropout) plus an isolated lane.",
+  "expected": {
+    "true_gaps": 3,
+    "should_connect": true,
+    "true_gaps_when_segmented": 2
+  },
+  "gaps": [
+    {
+      "type": "tree canopy",
+      "center": [
+        60,
+        108
+      ]
+    },
+    {
+      "type": "shadow",
+      "center": [
+        200,
+        200
+      ]
+    },
+    {
+      "type": "mask dropout (road visible in image)",
+      "center": [
+        310,
+        290
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "name": "02_curved_gap",
+  "description": "Curved road interrupted by a cast shadow.",
+  "expected": {
+    "true_gaps": 1,
+    "should_connect": true,
+    "true_gaps_when_segmented": 1
+  },
+  "gaps": [
+    {
+      "type": "shadow",
+      "center": [
+        183,
+        215
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

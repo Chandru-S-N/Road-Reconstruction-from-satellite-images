@@ -1,0 +1,16 @@
+# Web application
+Flask>=3.0
+
+# Image processing, graph and path search
+numpy>=1.24
+opencv-python>=4.8
+scikit-image>=0.21      # skeletonization and the Sato ridge filter used for road extraction
+scipy>=1.10             # distance transform used by the Dijkstra guide field
+networkx>=3.1           # road graph and Dijkstra shortest path
+
+# PDF report
+reportlab>=4.0
+
+# Tests
+pytest>=7.4
+pypdf>=4.0              # reads generated PDFs in the tests

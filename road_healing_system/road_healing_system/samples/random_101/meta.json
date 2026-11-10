@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "name": "random_101",
+  "description": "Randomised synthetic scene for parameter sweeps.",
+  "expected": {
+    "true_gaps": 2,
+    "hard_negatives": 0,
+    "true_gaps_when_segmented": 1
+  },
+  "gaps": [
+    {
+      "type": "mask dropout (road visible in image)",
+      "center": [
+        112,
+        351
+      ]
+    },
+    {
+      "type": "tree canopy",
+      "center": [
+        47,
+        390
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

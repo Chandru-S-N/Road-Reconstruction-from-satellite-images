@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "name": "05_vegetation_shadow_gap",
+  "description": "Diagonal road hidden under a tree and its shadow.",
+  "expected": {
+    "true_gaps": 1,
+    "should_connect": true,
+    "true_gaps_when_segmented": 1
+  },
+  "gaps": [
+    {
+      "type": "tree canopy",
+      "center": [
+        198,
+        198
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

@@ -1,0 +1,1 @@
+Scenario 9: a file with a .png name that cannot be decoded.

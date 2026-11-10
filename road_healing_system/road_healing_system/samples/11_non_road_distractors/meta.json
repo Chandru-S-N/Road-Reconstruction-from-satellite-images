@@ -1,0 +1,20 @@
+{
+  "synthetic": true,
+  "name": "11_non_road_distractors",
+  "description": "Roads beside bare grey ground, a grey roof, a car park and a river; one road gap under a tree.",
+  "expected": {
+    "true_gaps": 1,
+    "should_connect": true,
+    "true_gaps_when_segmented": 1
+  },
+  "gaps": [
+    {
+      "type": "tree canopy",
+      "center": [
+        262,
+        128
+      ]
+    }
+  ],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

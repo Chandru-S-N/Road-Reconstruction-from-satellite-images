@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "name": "06_unrelated_roads",
+  "description": "A road and an unrelated track end near each other at an angle.",
+  "expected": {
+    "true_gaps": 0,
+    "should_connect": false,
+    "true_gaps_when_segmented": 0
+  },
+  "gaps": [],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}

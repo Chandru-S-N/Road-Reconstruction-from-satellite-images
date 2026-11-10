@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "name": "08_no_valid_connection",
+  "description": "Two road ends far apart and pointing in unrelated directions.",
+  "expected": {
+    "true_gaps": 0,
+    "should_connect": false,
+    "true_gaps_when_segmented": 0
+  },
+  "gaps": [],
+  "note": "Procedurally generated test data, not real satellite imagery."
+}
